@@ -2,6 +2,7 @@
 
 import { revalidatePath } from "next/cache"
 import { createClient } from "@/lib/supabase/server"
+import { createAdminClient } from "@/lib/supabase/admin"
 
 type ActionResult = { error: string | null }
 
@@ -91,13 +92,14 @@ export async function invitarUsuario(
   const { data: { user } } = await supabase.auth.getUser()
   if (user?.user_metadata?.role !== "admin") return { error: "Sin permisos" }
 
-  // Crear usuario con service role (desde cliente browser limitado)
-  // La creación real se hace desde API route para usar service_role key
-  const response = await fetch("/api/admin/crear-usuario", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ email, role }),
+  const adminClient = createAdminClient()
+
+  const { error } = await adminClient.auth.admin.createUser({
+    email,
+    email_confirm: true,
+    user_metadata: { role },
   })
-  const result = await response.json()
-  return { error: result.error ?? null }
+
+  if (error) return { error: error.message }
+  return { error: null }
 }

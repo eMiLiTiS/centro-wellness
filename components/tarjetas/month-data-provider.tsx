@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useState } from "react"
+import { useEffect, useState, useCallback } from "react"
 import { createClient } from "@/lib/supabase/client"
 import { useMonthStore } from "@/lib/stores/month-store"
 import { TarjetasForm } from "./tarjetas-form"
@@ -26,7 +26,7 @@ export function TarjetasMonthProvider({ profesionales, role }: TarjetasMonthProv
   const [pasivoTotal, setPasivoTotal] = useState(0)
   const [loading, setLoading] = useState(true)
 
-  async function fetchTarjetas(mes: string) {
+  const fetchTarjetas = useCallback(async (mes: string) => {
     const supabase = createClient()
     setLoading(true)
 
@@ -48,11 +48,11 @@ export function TarjetasMonthProvider({ profesionales, role }: TarjetasMonthProv
     )
     setPasivoTotal(pasivo)
     setLoading(false)
-  }
+  }, [])
 
   useEffect(() => {
     fetchTarjetas(selectedMonth)
-  }, [selectedMonth])
+  }, [selectedMonth, fetchTarjetas])
 
   return (
     <div className="space-y-6">

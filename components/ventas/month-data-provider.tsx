@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useState } from "react"
+import { useEffect, useState, useCallback } from "react"
 import { createClient } from "@/lib/supabase/client"
 import { useMonthStore } from "@/lib/stores/month-store"
 import { VentasForm } from "./ventas-form"
@@ -24,7 +24,7 @@ export function VentasMonthProvider({ profesionales, role }: VentasMonthProvider
   const [productosAnteriores, setProductosAnteriores] = useState<string[]>([])
   const [loading, setLoading] = useState(true)
 
-  async function fetchVentas(mes: string) {
+  const fetchVentas = useCallback(async (mes: string) => {
     const supabase = createClient()
     setLoading(true)
     const [ventasRes, productosRes] = await Promise.all([
@@ -45,11 +45,11 @@ export function VentasMonthProvider({ profesionales, role }: VentasMonthProvider
       .filter((p) => { if (seen.has(p)) return false; seen.add(p); return true })
     setProductosAnteriores(unique)
     setLoading(false)
-  }
+  }, [])
 
   useEffect(() => {
     fetchVentas(selectedMonth)
-  }, [selectedMonth])
+  }, [selectedMonth, fetchVentas])
 
   return (
     <div className="space-y-6">

@@ -38,10 +38,8 @@ interface ProfesionalStats {
   nombre: string
   facturacion: number
   horasDisponibles: number
-  minutosOcupados: number
   eurosPorHora: number
-  ocupacion: number
-  rankingServicios: { nombre: string; eurosPorMin: number }[]
+  rankingServicios: { nombre: string; importe: number }[]
 }
 
 interface PagoDesglose {
@@ -108,31 +106,25 @@ export function DashboardContent() {
     const stats: ProfesionalStats[] = profesionales.map((p) => {
       const regs = registros.filter((r) => r.profesional_id === p.id)
       const facturacion = regs.reduce((a, r) => a + Number(r.importe), 0)
-      const minOcupados = regs.reduce((a) => a + 0, 0)
       const horasDisp = horasMap[p.id] ?? 0
       const eurosPorHora = horasDisp > 0 ? facturacion / horasDisp : 0
 
-      // Ranking servicios por €/min
-      const servicioMap: Record<string, { importe: number; minutos: number }> = {}
+      const importeByServicio: Record<string, number> = {}
       regs.forEach((r) => {
-        if (!servicioMap[r.servicio_nombre]) servicioMap[r.servicio_nombre] = { importe: 0, minutos: 0 }
-        servicioMap[r.servicio_nombre].importe += Number(r.importe)
+        importeByServicio[r.servicio_nombre] = (importeByServicio[r.servicio_nombre] ?? 0) + Number(r.importe)
       })
 
-      const rankingServicios = Object.entries(servicioMap)
-        .map(([nombre, { importe }]) => ({ nombre, eurosPorMin: 0, importe }))
-        .sort((a, b) => b.importe - a.importe)
+      const rankingServicios = Object.entries(importeByServicio)
+        .sort(([, a], [, b]) => b - a)
         .slice(0, 3)
-        .map(({ nombre, importe }) => ({ nombre, eurosPorMin: importe }))
+        .map(([nombre, importe]) => ({ nombre, importe }))
 
       return {
         id: p.id,
         nombre: p.nombre,
         facturacion,
         horasDisponibles: horasDisp,
-        minutosOcupados: minOcupados,
         eurosPorHora,
-        ocupacion: 0,
         rankingServicios,
       }
     }).filter((s) => s.facturacion > 0 || s.horasDisponibles > 0)
@@ -244,7 +236,7 @@ export function DashboardContent() {
                       {p.rankingServicios.map((s) => (
                         <div key={s.nombre} className="flex justify-between text-xs">
                           <span className="truncate text-muted-foreground">{s.nombre}</span>
-                          <span className="shrink-0 ml-2">{formatEUR(s.eurosPorMin)}</span>
+                          <span className="shrink-0 ml-2">{formatEUR(s.importe)}</span>
                         </div>
                       ))}
                     </div>

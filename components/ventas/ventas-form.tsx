@@ -10,6 +10,7 @@ import type { Database } from "@/lib/supabase/types"
 import { crearVenta, actualizarVenta } from "@/app/(app)/ventas/actions"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
+import { TotalField } from "@/components/ui/total-field"
 import {
   Form,
   FormControl,
@@ -29,7 +30,6 @@ import { Combobox } from "@/components/ui/combobox"
 import { AutocompleteInput } from "@/components/ui/autocomplete-input"
 import { useToast } from "@/hooks/use-toast"
 import { Loader2 } from "lucide-react"
-import { formatEUR } from "@/lib/format"
 
 type Profesional = Database["public"]["Tables"]["profesionales"]["Row"]
 type Venta = Database["public"]["Tables"]["ventas"]["Row"]
@@ -168,12 +168,7 @@ export function VentasForm({
             )}
           />
 
-          <FormItem>
-            <FormLabel>Total</FormLabel>
-            <div className="h-10 flex items-center px-3 rounded-md border border-input bg-muted text-sm font-semibold text-primary">
-              {formatEUR(totalCalculado)}
-            </div>
-          </FormItem>
+          <TotalField value={totalCalculado} />
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">

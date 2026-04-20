@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useState } from "react"
+import { useEffect, useState, useCallback } from "react"
 import { createClient } from "@/lib/supabase/client"
 import { useMonthStore } from "@/lib/stores/month-store"
 import { ServiciosForm } from "./servicios-form"
@@ -25,20 +25,21 @@ export function MonthDataProvider({ servicios, profesionales, role }: MonthDataP
   const [registros, setRegistros] = useState<Registro[]>([])
   const [loading, setLoading] = useState(true)
 
-  useEffect(() => {
+  const fetchRegistros = useCallback(async (mes: string) => {
     const supabase = createClient()
     setLoading(true)
-
-    supabase
+    const { data } = await supabase
       .from("registros")
       .select("*")
-      .eq("mes", selectedMonth)
+      .eq("mes", mes)
       .order("fecha", { ascending: false })
-      .then(({ data }) => {
-        setRegistros(data ?? [])
-        setLoading(false)
-      })
-  }, [selectedMonth])
+    setRegistros(data ?? [])
+    setLoading(false)
+  }, [])
+
+  useEffect(() => {
+    fetchRegistros(selectedMonth)
+  }, [selectedMonth, fetchRegistros])
 
   return (
     <div className="space-y-6">
@@ -55,15 +56,7 @@ export function MonthDataProvider({ servicios, profesionales, role }: MonthDataP
           servicios={servicios}
           profesionales={profesionales}
           mes={selectedMonth}
-          onSuccess={() => {
-            const supabase = createClient()
-            supabase
-              .from("registros")
-              .select("*")
-              .eq("mes", selectedMonth)
-              .order("fecha", { ascending: false })
-              .then(({ data }) => setRegistros(data ?? []))
-          }}
+          onSuccess={() => fetchRegistros(selectedMonth)}
         />
       </div>
 
