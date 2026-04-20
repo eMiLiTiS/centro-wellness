@@ -1,0 +1,25 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npx create-next-app@14 . --typescript --tailwind --eslint --app --no-src-dir --import-alias \"@/*\" --no-git --yes)",
+      "Bash(npx create-next-app@14 centro-wellness --typescript --tailwind --eslint --app --no-src-dir --import-alias \"@/*\" --no-git --yes)",
+      "Bash(mv centro-wellness/* .)",
+      "Bash(mv centro-wellness/.gitignore .)",
+      "Bash(mv centro-wellness/.eslintrc.json .)",
+      "Bash(rm -rf centro-wellness)",
+      "Bash(cp centro-wellness/.gitignore .)",
+      "Bash(cp centro-wellness/.eslintrc.json .)",
+      "Bash(npm install *)",
+      "Bash(npx shadcn@latest init --yes --base-color violet --css-variables)",
+      "Bash(npx shadcn@latest init --yes)",
+      "Bash(npx shadcn@latest add button input label form dialog select command table card tabs toast dropdown-menu popover badge separator scroll-area --yes)",
+      "Bash(npx shadcn@latest add skeleton --yes)",
+      "Bash(npx tsc *)",
+      "Bash(node -e \"console.log\\(require\\('./node_modules/class-variance-authority/package.json'\\).version\\)\")",
+      "Bash(npm run *)",
+      "Bash(npm uninstall *)",
+      "Bash(node -e ' *)",
+      "Bash(node scripts/generate-icons.mjs)"
+    ]
+  }
+}
